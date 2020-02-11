@@ -18,6 +18,7 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 import seaborn as sns
+import random
 
 
 # Data Centering
@@ -104,4 +105,24 @@ def optimal_clusters(data):
 
 
 if __name__ == '__main__':
-    pass
+    heart_disease = pd.read_csv('heart_disease_patients.csv')
+    hdp = pd.DataFrame(heart_disease)
+    print(hdp.head())
+    hdp.hist()
+    plt.show()
+
+    hdp = hdp.drop(['id'], axis=1)
+    scaled = standardization(hdp)
+    scaled.hist()
+    plt.show()
+
+    optimal_clusters(scaled)
+
+    random.seed(10)
+    k = int(input("What is the optimal K?"))
+    kmeans = KMeans(n_clusters=k)
+    model = kmeans.fit(scaled)
+    first_clust = pd.DataFrame(model.predict(scaled))
+    print(first_clust[0].value_counts())
+
+    # use groupby .mean .std
