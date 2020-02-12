@@ -108,27 +108,33 @@ if __name__ == '__main__':
     heart_disease = pd.read_csv('heart_disease_patients.csv')
     hdp = pd.DataFrame(heart_disease)
     print(hdp.head())
+    hdp.dropna()
+    hdp = hdp.drop(['id'], axis=1)
     hdp.hist()
     plt.show()
 
-    hdp = hdp.drop(['id'], axis=1)
     scaled = standardization(hdp)
     scaled.hist()
+    plt.show()
+
+    centered = centering(scaled)
+    centered.hist()
     plt.show()
 
     random.seed(10)
     optimal_clusters(scaled)
 
     k = int(input("What is the optimal K?"))
+    inertias = []
     for i in range(20):
         random.seed(i)
         kmeans = KMeans(n_clusters=k)
         model = kmeans.fit(scaled)
-        print(i, model.inertia_)
+        inertias.append(model.inertia_)
+    random.seed(inertias.index(max(inertias)))
 
-    random.seed(int(input("What is the best seed?")))
     kmeans = KMeans(n_clusters=k)
     model = kmeans.fit(scaled)
-    prediction = model.predict(scaled)
-    print(prediction)
-    # use groupby .mean .std
+    hdp['Cluster'] = model.predict(scaled)
+    print(hdp.groupby(['Cluster']).mean())
+    print(hdp.groupby(['Cluster']).std())
