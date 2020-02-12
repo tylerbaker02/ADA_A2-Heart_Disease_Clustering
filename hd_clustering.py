@@ -116,13 +116,19 @@ if __name__ == '__main__':
     scaled.hist()
     plt.show()
 
+    random.seed(10)
     optimal_clusters(scaled)
 
-    random.seed(10)
     k = int(input("What is the optimal K?"))
+    for i in range(20):
+        random.seed(i)
+        kmeans = KMeans(n_clusters=k)
+        model = kmeans.fit(scaled)
+        print(i, model.inertia_)
+
+    random.seed(int(input("What is the best seed?")))
     kmeans = KMeans(n_clusters=k)
     model = kmeans.fit(scaled)
-    first_clust = pd.DataFrame(model.predict(scaled))
-    print(first_clust[0].value_counts())
-
+    prediction = model.predict(scaled)
+    print(prediction)
     # use groupby .mean .std
