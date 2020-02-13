@@ -1,4 +1,4 @@
-""" Cluster Heard Disease Data
+""" Cluster Heart Disease Data
 Author: Tyler Baker
 Class:  DAT-310-01
 Certification of Authenticity:
@@ -108,40 +108,55 @@ if __name__ == '__main__':
     heart_disease = pd.read_csv('heart_disease_patients.csv')
     hdp = pd.DataFrame(heart_disease)
     print(hdp.head())
+
+    # Drop unneeded columns and null values
     hdp.dropna()
-    hdp = hdp.drop(['id'], axis=1)
+    hdp = hdp.drop(['id', 'cp', 'restecg', 'slope'], axis=1)
+
+    # show current distribution for reference
     hdp.hist()
     plt.show()
 
+    # standardize dataframe and show distribution for reference
     scaled = standardization(hdp)
     scaled.hist()
     plt.show()
 
+    # Display correlation map to determine if there is correlation
     correlation_map(scaled)
+    # decorrelate the data anyways
     deco = decorrelation(scaled)
-    print(deco.mean(), deco.std())
+
+    # restandardize the data and show distribution for reference
     rescaled = standardization(deco)
     rescaled.hist()
-    print(rescaled.mean(), rescaled.std())
     plt.show()
 
+    # check if feature reduction is useful (it is not)
     feature_variance_check(rescaled)
 
+    # set seed and display elbow graph to see what K should be
     random.seed(10)
-    optimal_clusters(scaled)
+    optimal_clusters(rescaled)
 
+    # user inputs what K should be
     k = int(input("What is the optimal K?"))
     inertias = []
+
+    # Run through multiple seeds and pick the one with the KMeans model with the least inertia
     for i in range(20):
         random.seed(i)
         kmeans = KMeans(n_clusters=k)
-        model = kmeans.fit(scaled)
+        model = kmeans.fit(rescaled)
         inertias.append(model.inertia_)
-    random.seed(inertias.index(max(inertias)))
+    random.seed(inertias.index(min(inertias)))
 
+    # Cluster the data with the seed and K values and sort dataframe by those clusters
     kmeans = KMeans(n_clusters=k)
-    model = kmeans.fit(scaled)
-    hdp['Cluster'] = model.predict(scaled)
+    model = kmeans.fit(rescaled)
+    hdp['Cluster'] = model.predict(rescaled)
+
+    # Display cluster means and std
     pd.options.display.width = 0
     print(hdp.groupby(['Cluster']).mean())
     print(hdp.groupby(['Cluster']).std())
