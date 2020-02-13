@@ -10,7 +10,7 @@ of academic staff and / or communicate a copy of this assignment to a plagiarism
 service(which may then retain a copy of this assignment on its database for the purpose
 of future plagiarism checking).
 """
-from sklearn import datasets
+
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
