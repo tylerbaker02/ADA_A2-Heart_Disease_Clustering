@@ -88,7 +88,7 @@ def feature_reduction(data, num_com=2):
 # Finding the optimal number of clusters
 def optimal_clusters(data):
     """ Build an elbow graph for the given data. """
-    ks = range(1, 6)
+    ks = range(1, 8)
     inertia = []
 
     for k in ks:
@@ -117,9 +117,15 @@ if __name__ == '__main__':
     scaled.hist()
     plt.show()
 
-    centered = centering(scaled)
-    centered.hist()
+    correlation_map(scaled)
+    deco = decorrelation(scaled)
+    print(deco.mean(), deco.std())
+    rescaled = standardization(deco)
+    rescaled.hist()
+    print(rescaled.mean(), rescaled.std())
     plt.show()
+
+    feature_variance_check(rescaled)
 
     random.seed(10)
     optimal_clusters(scaled)
@@ -136,5 +142,6 @@ if __name__ == '__main__':
     kmeans = KMeans(n_clusters=k)
     model = kmeans.fit(scaled)
     hdp['Cluster'] = model.predict(scaled)
+    pd.options.display.width = 0
     print(hdp.groupby(['Cluster']).mean())
     print(hdp.groupby(['Cluster']).std())
